@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0d1117" />
+  <title>Mike – Mi Comisión</title>
+  <meta name="description" content="Dashboard personal de Mike Garnica para calcular sus ganancias por comisión de performance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ════════════════════════════════════
+       TOKENS
+    ════════════════════════════════════ */
+    :root {
+      --bg:         #0a0e14;
+      --surface:    #13181f;
+      --surface2:   #1a2130;
+      --border:     rgba(255,255,255,0.07);
+      --border-h:   rgba(255,255,255,0.14);
+      --accent:     #00e5a0;     /* green – Mike's earnings */
+      --accent2:    #4f8cff;     /* blue  – client net */
+      --gold:       #fbbf24;
+      --muted:      #8b949e;
+      --text:       #e6edf3;
+      --radius:     18px;
+      --radius-sm:  12px;
+
+      /* safe area for iPhone notch / Dynamic Island */
+      --safe-t: env(safe-area-inset-top,    0px);
+      --safe-b: env(safe-area-inset-bottom, 0px);
+      --safe-l: env(safe-area-inset-left,   0px);
+      --safe-r: env(safe-area-inset-right,  0px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      /* respect Dynamic Island + home indicator */
+      padding:
+        calc(var(--safe-t) + 20px)
+        calc(var(--safe-r) + 16px)
+        calc(var(--safe-b) + 32px)
+        calc(var(--safe-l) + 16px);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ════════════════════════════════════
+       HEADER
+    ════════════════════════════════════ */
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(0,229,160,.14), rgba(79,140,255,.14));
+      border: 1px solid rgba(0,229,160,.28);
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 14px;
+    }
+    .badge::before { content: '💰'; font-size: 12px; }
+    header h1 {
+      font-size: clamp(26px, 8vw, 42px);
+      font-weight: 900;
+      background: linear-gradient(135deg, #e6edf3 20%, var(--accent) 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+    }
+    header .sub {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ════════════════════════════════════
+       LAYOUT – Mobile-first single column,
+       2-col on ≥820px
+    ════════════════════════════════════ */
+    .layout {
+      display: grid;
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    @media (min-width: 820px) {
+      .layout {
+        grid-template-columns: 320px 1fr;
+        gap: 20px;
+      }
+      .inputs-panel { grid-row: 1 / 3; }
+    }
+
+    /* ════════════════════════════════════
+       CARD
+    ════════════════════════════════════ */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color .25s;
+    }
+    @media (min-width: 820px) { .card { padding: 24px; } }
+
+    .card-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    /* ════════════════════════════════════
+       INPUTS
+    ════════════════════════════════════ */
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 7px;
+      letter-spacing: .3px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap .prefix,
+    .input-wrap .suffix {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .input-wrap .prefix { left: 14px; }
+    .input-wrap .suffix { right: 14px; }
+
+    input[type="number"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px; /* prevents iOS auto-zoom */
+      font-weight: 700;
+      padding: 14px 14px 14px 38px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      -moz-appearance: textfield;
+      /* min touch target */
+      min-height: 48px;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"].no-prefix  { padding-left: 14px; }
+    input[type="number"].has-suffix { padding-right: 36px; }
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,229,160,.14);
+    }
+
+    /* slider */
+    .range-wrap { margin-top: 10px; }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 100px;
+      background: var(--surface2);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px; height: 24px; /* bigger for touch */
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(0,229,160,.5);
+      cursor: pointer;
+      transition: transform .15s;
+    }
+    input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.25); }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    /* hurdle status pill */
+    .hurdle-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+    .h-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: background .3s, box-shadow .3s;
+    }
+    .h-dot.above { background: var(--accent); box-shadow: 0 0 8px rgba(0,229,160,.7); }
+    .h-dot.below { background: #ff6b6b;        box-shadow: 0 0 8px rgba(255,107,107,.6); }
+    .h-text { font-size: 12px; line-height: 1.4; }
+    .h-text strong { font-weight: 700; }
+    .h-text span   { color: var(--muted); }
+
+    /* CTA button */
+    .btn-calc {
+      width: 100%;
+      min-height: 52px;
+      background: linear-gradient(135deg, var(--accent), #00c880);
+      color: #0a0e14;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      letter-spacing: .3px;
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 22px rgba(0,229,160,.3);
+    }
+    .btn-calc:active { transform: scale(.98); }
+
+    /* ════════════════════════════════════
+       KPI HERO – Mike's earnings first
+    ════════════════════════════════════ */
+    .hero-earn {
+      background: linear-gradient(135deg, rgba(0,229,160,.12) 0%, rgba(0,200,128,.06) 100%);
+      border: 1px solid rgba(0,229,160,.25);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-earn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% -20%, rgba(0,229,160,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-earn .label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .hero-earn .amount {
+      font-size: clamp(32px, 10vw, 52px);
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .hero-earn .sub-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .hero-earn .chip {
+      background: rgba(0,229,160,.12);
+      border: 1px solid rgba(0,229,160,.2);
+      border-radius: 100px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* ════════════════════════════════════
+       KPI GRID
+    ════════════════════════════════════ */
+    .kpis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 480px) { .kpis { grid-template-columns: repeat(3, 1fr); } }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 14px 14px 0 0;
+    }
+    .kpi.blue   ::after, .kpi.blue   { }
+    .kpi.blue::after   { background: linear-gradient(90deg, #4f8cff, #7b61ff); }
+    .kpi.gold::after   { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .kpi.purple::after { background: linear-gradient(90deg, #c084fc, #7b61ff); }
+    .kpi.teal::after   { background: linear-gradient(90deg, #22d3ee, #0891b2); }
+    .kpi.pink::after   { background: linear-gradient(90deg, #f472b6, #ec4899); }
+
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-size: clamp(16px, 4vw, 22px);
+      font-weight: 800;
+      line-height: 1;
+    }
+    .kpi.blue   .kpi-value { color: #4f8cff; }
+    .kpi.gold   .kpi-value { color: #fbbf24; }
+    .kpi.purple .kpi-value { color: #c084fc; }
+    .kpi.teal   .kpi-value { color: #22d3ee; }
+    .kpi.pink   .kpi-value { color: #f472b6; }
+    .kpi-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+    /* ════════════════════════════════════
+       DONUT + BARS section
+    ════════════════════════════════════ */
+    .viz-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media (min-width: 480px) {
+      .viz-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* donut */
+    .donut-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .donut-container {
+      position: relative;
+      width: min(160px, 42vw);
+      height: min(160px, 42vw);
+    }
+    .donut-container svg {
+      transform: rotate(-90deg);
+      width: 100%; height: 100%;
+    }
+    .donut-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .donut-center .d-big   { font-size: clamp(16px, 5vw, 22px); font-weight: 900; color: var(--accent); }
+    .donut-center .d-small { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .donut-legend { font-size: 11px; color: var(--muted); text-align: center; }
+
+    /* bars */
+    .bars { display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+    .bar-row .bar-meta {
+      display: flex; justify-content: space-between;
+      font-size: 11px; margin-bottom: 5px;
+    }
+    .bar-row .bar-name { font-weight: 700; }
+    .bar-row .bar-val  { color: var(--muted); font-weight: 500; }
+    .bar-track {
+      height: 7px;
+      background: var(--surface2);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width .7s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    /* ════════════════════════════════════
+       GAUGE
+    ════════════════════════════════════ */
+    .gauge-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .gauge-arc {
+      width: min(200px, 55vw);
+      overflow: hidden;
+    }
+    .gauge-arc svg { width: 100%; height: auto; }
+    .gauge-num { font-size: clamp(28px, 8vw, 38px); font-weight: 900; color: var(--accent); }
+    .gauge-sub { font-size: 11px; color: var(--muted); text-align: center; }
+
+    /* ════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════ */
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 36px;
+      opacity: .5;
+    }
+
+    /* ════════════════════════════════════
+       ANIMATIONS
+    ════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+    .card, .hero-earn, .kpi {
+      animation: fadeUp .45s ease both;
+    }
+    .kpi:nth-child(2) { animation-delay: .05s; }
+    .kpi:nth-child(3) { animation-delay: .10s; }
+    .kpi:nth-child(4) { animation-delay: .15s; }
+    .kpi:nth-child(5) { animation-delay: .20s; }
+  </style>
+</head>
+<body>
+
+<!-- ──────────────── HEADER ──────────────── -->
+<header>
+  <div class="badge">Mi Dashboard de Comisiones</div>
+  <h1>Mi Ganancia 💸</h1>
+  <p class="sub">Calcula cuánto ganas por gestionar el portafolio<br>con base en el rendimiento logrado</p>
+</header>
+
+<div class="layout">
+
+  <!-- ══════════ PANEL DE INPUTS ══════════ -->
+  <div class="card inputs-panel">
+    <div class="card-title">⚙ Parámetros del deal</div>
+
+    <!-- Monto bajo gestión -->
+    <div class="field">
+      <label for="amount_invested">Monto bajo gestión (MXN)</label>
+      <div class="input-wrap">
+        <span class="prefix">$</span>
+        <input type="number" id="amount_invested" value="1000000" min="0" step="50000" />
+      </div>
+    </div>
+
+    <!-- Rendimiento -->
+    <div class="field">
+      <label for="return_pct">Rendimiento anual logrado</label>
+      <div class="input-wrap">
+        <input type="number" id="return_pct" value="37" min="0" max="200" step="0.5"
+               class="no-prefix has-suffix" inputmode="decimal" />
+        <span class="suffix">%</span>
+      </div>
+      <div class="range-wrap">
+        <input type="range" id="return_range" min="0" max="100" step="0.5" value="37" />
+        <div class="range-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+      </div>
+    </div>
+
+    <!-- Hurdle rate -->
+    <div class="field">
+      <label for="hurdle_rate">Hurdle rate (mínimo para cobrar)</label>
+      <div class="input-wrap">
+        <input type="number" id="hurdle_rate" value="12" min="0" max="100" step="0.5"
+               class="no-prefix has-suffix" inputmode="decimal" />
+        <span class="suffix">%</span>
+      </div>
+      <div class="range-wrap">
+        <input type="range" id="hurdle_range" min="0" max="30" step="0.5" value="12" />
+        <div class="range-labels"><span>0%</span><span>15%</span><span>30%</span></div>
+      </div>
+    </div>
+
+    <!-- Tasa de comisión -->
+    <div class="field">
+      <label for="commission_rate">Mi tasa de comisión (% del excedente)</label>
+      <div class="input-wrap">
+        <input type="number" id="commission_rate" value="25" min="0" max="100" step="1"
+               class="no-prefix has-suffix" inputmode="decimal" />
+        <span class="suffix">%</span>
+      </div>
+      <div class="range-wrap">
+        <input type="range" id="commission_range" min="0" max="50" step="1" value="25" />
+        <div class="range-labels"><span>0%</span><span>25%</span><span>50%</span></div>
+      </div>
+    </div>
+
+    <!-- Status hurdle -->
+    <div class="hurdle-pill">
+      <div class="h-dot above" id="h-dot"></div>
+      <div class="h-text">
+        <strong id="h-title">Rendimiento supera el hurdle</strong><br>
+        <span id="h-msg">¡Cobras comisión sobre el excedente!</span>
+      </div>
+    </div>
+
+    <button class="btn-calc" onclick="calculate()">Calcular mis ganancias →</button>
+  </div>
+
+  <!-- ══════════ RESULTADOS ══════════ -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+
+    <!-- HERO: Mi ganancia -->
+    <div class="hero-earn">
+      <div class="label">💰 Mi Comisión (Ganancia)</div>
+      <div class="amount" id="hero-commission">$0</div>
+      <div class="sub-row">
+        <div class="chip" id="hero-pct-chip">0% del rendimiento</div>
+        <div class="chip" id="hero-pp-chip">0 pp sobre hurdle</div>
+      </div>
+    </div>
+
+    <!-- KPIs del cliente / contexto -->
+    <div class="kpis">
+      <div class="kpi blue">
+        <div class="kpi-label">Rendimiento Bruto</div>
+        <div class="kpi-value" id="kpi-gross">$0</div>
+        <div class="kpi-sub" id="kpi-gross-sub">generado total</div>
+      </div>
+      <div class="kpi teal">
+        <div class="kpi-label">Ganancia del Cliente</div>
+        <div class="kpi-value" id="kpi-net">$0</div>
+        <div class="kpi-sub">neto descontando mi fee</div>
+      </div>
+      <div class="kpi gold">
+        <div class="kpi-label">Capital Final</div>
+        <div class="kpi-value" id="kpi-total">$0</div>
+        <div class="kpi-sub">inversión + neto</div>
+      </div>
+      <div class="kpi purple">
+        <div class="kpi-label">Excedente Hurdle</div>
+        <div class="kpi-value" id="kpi-excess">0 pp</div>
+        <div class="kpi-sub">puntos sobre mínimo</div>
+      </div>
+      <div class="kpi pink">
+        <div class="kpi-label">Mi Fee / Rendimiento</div>
+        <div class="kpi-value" id="kpi-fee-pct">0%</div>
+        <div class="kpi-sub">% que me llevo</div>
+      </div>
+    </div>
+
+    <!-- VIZ CARD -->
+    <div class="card">
+      <div class="card-title">📊 Desglose visual</div>
+      <div class="viz-grid">
+
+        <!-- Donut -->
+        <div class="donut-wrap">
+          <div class="donut-container">
+            <svg id="donut-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#1a2130" stroke-width="13"/>
+              <circle id="donut-client" cx="50" cy="50" r="38" fill="none" stroke="#4f8cff"
+                      stroke-width="13" stroke-dasharray="0 239" stroke-linecap="round"/>
+              <circle id="donut-mike"   cx="50" cy="50" r="38" fill="none" stroke="#00e5a0"
+                      stroke-width="13" stroke-dasharray="0 239" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center">
+              <div class="d-big"  id="donut-pct">0%</div>
+              <div class="d-small">mi fee</div>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <span style="color:var(--accent)">■</span> Mi comisión &nbsp;
+            <span style="color:#4f8cff">■</span> Neto cliente
+          </div>
+        </div>
+
+        <!-- Bars -->
+        <div class="bars">
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-name" style="color:var(--accent)">Mi Comisión</span>
+              <span class="bar-val" id="bar-fee-val">$0</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" id="bar-fee"
+                   style="width:0%;background:linear-gradient(90deg,var(--accent),#00c880)"></div>
+            </div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-name" style="color:#4f8cff">Neto Cliente</span>
+              <span class="bar-val" id="bar-net-val">$0</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" id="bar-net"
+                   style="width:0%;background:linear-gradient(90deg,#4f8cff,#7b61ff)"></div>
+            </div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-name" style="color:#fbbf24">Rendimiento Total</span>
+              <span class="bar-val" id="bar-gross-val">$0</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" id="bar-gross"
+                   style="width:100%;background:linear-gradient(90deg,#fbbf24,#f59e0b)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gauge: mi fee como % del rendimiento -->
+      <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:18px;">
+        <div class="card-title" style="margin-bottom:14px;">Mi comisión como % del rendimiento anual</div>
+        <div class="gauge-section">
+          <div class="gauge-arc">
+            <svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 100 A 80 80 0 0 1 180 100"
+                    fill="none" stroke="#1a2130" stroke-width="16" stroke-linecap="round"/>
+              <path id="gauge-fill" d="M 20 100 A 80 80 0 0 1 180 100"
+                    fill="none" stroke="url(#gGrad)" stroke-width="16" stroke-linecap="round"
+                    stroke-dasharray="0 252"/>
+              <defs>
+                <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%"   stop-color="#00e5a0"/>
+                  <stop offset="60%"  stop-color="#fbbf24"/>
+                  <stop offset="100%" stop-color="#f472b6"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="gauge-num" id="gauge-pct">0%</div>
+          <div class="gauge-sub">de cada $100 generados me llevo</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /results col -->
+</div><!-- /layout -->
+
+<footer>
+  Mike Garnica · Dashboard Personal de Comisiones · Portfolio Management MXN
+</footer>
+
+<script>
+  /* ── Sync sliders ↔ number inputs ── */
+  function syncPair(numId, rangeId) {
+    const num   = document.getElementById(numId);
+    const range = document.getElementById(rangeId);
+    num  .addEventListener('input', () => { range.value = num.value;   calculate(); });
+    range.addEventListener('input', () => { num.value   = range.value; calculate(); });
+  }
+  syncPair('return_pct',      'return_range');
+  syncPair('hurdle_rate',     'hurdle_range');
+  syncPair('commission_rate', 'commission_range');
+  document.getElementById('amount_invested').addEventListener('input', calculate);
+
+  /* ── Formatters ── */
+  const fmt  = n => '$' + Math.round(n).toLocaleString('es-MX');
+  const fmtD = n => '$' + n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtP = n => n.toFixed(2) + '%';
+
+  /* ── Core logic ── */
+  function calculate() {
+    const invested   = parseFloat(document.getElementById('amount_invested').value)  || 0;
+    const returnPct  = parseFloat(document.getElementById('return_pct').value)       || 0;
+    const hurdleRate = parseFloat(document.getElementById('hurdle_rate').value)      || 0;
+    const commRate   = parseFloat(document.getElementById('commission_rate').value)  || 0;
+
+    /* gross earnings */
+    const grossGain = invested * (returnPct / 100);
+
+    let commission = 0, diffPP = 0;
+    let clientNet  = grossGain;
+    let clientTotal = invested + grossGain;
+
+    if (returnPct > hurdleRate) {
+      diffPP     = returnPct - hurdleRate;
+      commission = grossGain * (diffPP / 100) * (commRate / 100);
+      clientNet  = grossGain - commission;
+      clientTotal = invested + clientNet;
+    }
+
+    /* Mike's fee as % of total annual return */
+    const feePct = grossGain > 0 ? (commission / grossGain) * 100 : 0;
+
+    /* ── HERO ── */
+    document.getElementById('hero-commission').textContent = fmt(commission);
+    document.getElementById('hero-pct-chip').textContent   = fmtP(feePct) + ' del rendimiento';
+    document.getElementById('hero-pp-chip').textContent    = diffPP.toFixed(2) + ' pp sobre hurdle';
+
+    /* ── KPIs ── */
+    document.getElementById('kpi-gross').textContent   = fmt(grossGain);
+    document.getElementById('kpi-gross-sub').textContent = fmtD(grossGain) + ' MXN';
+    document.getElementById('kpi-net').textContent     = fmt(clientNet);
+    document.getElementById('kpi-total').textContent   = fmt(clientTotal);
+    document.getElementById('kpi-excess').textContent  = diffPP.toFixed(2) + ' pp';
+    document.getElementById('kpi-fee-pct').textContent = fmtP(feePct);
+
+    /* ── Hurdle pill ── */
+    const dot  = document.getElementById('h-dot');
+    const htit = document.getElementById('h-title');
+    const hmsg = document.getElementById('h-msg');
+    if (returnPct > hurdleRate) {
+      dot.className = 'h-dot above';
+      htit.textContent = '✅ Rendimiento supera el hurdle';
+      hmsg.textContent = `Cobras sobre ${diffPP.toFixed(2)} pp de excedente`;
+    } else {
+      dot.className = 'h-dot below';
+      htit.textContent = '⛔ Bajo el hurdle rate';
+      hmsg.textContent = 'Aún no hay comisión para ti';
+    }
+
+    /* ── Bars ── */
+    const ref = Math.max(grossGain, 1);
+    document.getElementById('bar-fee-val').textContent  = fmtD(commission);
+    document.getElementById('bar-net-val').textContent  = fmtD(clientNet);
+    document.getElementById('bar-gross-val').textContent = fmtD(grossGain);
+    document.getElementById('bar-fee').style.width   = (commission / ref * 100) + '%';
+    document.getElementById('bar-net').style.width   = (clientNet  / ref * 100) + '%';
+    document.getElementById('bar-gross').style.width = '100%';
+
+    /* ── Donut ── */
+    const circ      = 2 * Math.PI * 38;
+    const mikePct   = grossGain > 0 ? commission / grossGain : 0;
+    const clientPct = 1 - mikePct;
+    const mikeDash   = mikePct   * circ;
+    const clientDash = clientPct * circ;
+
+    const dClient = document.getElementById('donut-client');
+    const dMike   = document.getElementById('donut-mike');
+    dClient.setAttribute('stroke-dasharray', `${clientDash.toFixed(2)} ${circ.toFixed(2)}`);
+    dClient.setAttribute('stroke-dashoffset', '0');
+    dMike.setAttribute('stroke-dasharray',  `${mikeDash.toFixed(2)} ${circ.toFixed(2)}`);
+    dMike.setAttribute('stroke-dashoffset', `-${clientDash.toFixed(2)}`);
+    document.getElementById('donut-pct').textContent = fmtP(feePct);
+
+    /* ── Gauge ── */
+    const arcLen = Math.PI * 80;
+    const filled = Math.min(feePct / 100, 1) * arcLen;
+    document.getElementById('gauge-fill').setAttribute(
+      'stroke-dasharray', `${filled.toFixed(2)} ${arcLen.toFixed(2)}`
+    );
+    document.getElementById('gauge-pct').textContent = fmtP(feePct);
+  }
+
+  /* initial render */
+  calculate();
+</script>
+</body>
+</html>
