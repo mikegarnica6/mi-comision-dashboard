@@ -707,8 +707,11 @@
 
     if (returnPct > hurdleRate) {
       diffPP     = returnPct - hurdleRate;
-      commission = grossGain * (diffPP / 100) * (commRate / 100);
-      clientNet  = grossGain - commission;
+      // ✅ Correcto: comisión = capital_invertido × exceso% × tasa_comisión
+      // El exceso en $ es: invested × (diffPP/100)
+      const excessReturn = invested * (diffPP / 100);
+      commission  = excessReturn * (commRate / 100);
+      clientNet   = grossGain - commission;
       clientTotal = invested + clientNet;
     }
 
