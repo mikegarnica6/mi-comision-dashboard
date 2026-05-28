@@ -501,12 +501,12 @@
     <div class="field">
       <label for="hurdle_rate">Hurdle rate (mínimo para cobrar)</label>
       <div class="input-wrap">
-        <input type="number" id="hurdle_rate" value="12" min="0" max="100" step="0.5"
+        <input type="number" id="hurdle_rate" value="8.8" min="0" max="100" step="0.1"
                class="no-prefix has-suffix" inputmode="decimal" />
         <span class="suffix">%</span>
       </div>
       <div class="range-wrap">
-        <input type="range" id="hurdle_range" min="0" max="30" step="0.5" value="12" />
+        <input type="range" id="hurdle_range" min="0" max="30" step="0.1" value="8.8" />
         <div class="range-labels"><span>0%</span><span>15%</span><span>30%</span></div>
       </div>
     </div>
@@ -668,6 +668,317 @@
 
   </div><!-- /results col -->
 </div><!-- /layout -->
+
+<!-- ══════════════════════════════════════════
+     TIERED COMMISSION GUIDE
+══════════════════════════════════════════ -->
+<section class="tier-section">
+  <div class="tier-header">
+    <div class="badge" style="margin-bottom:12px;">Mi Estructura de Comisiones</div>
+    <h2 class="tier-title">Tabla Escalonada de Comisiones</h2>
+    <p class="tier-sub">Hurdle rate fijo: <strong style="color:var(--accent)">8.8%</strong> · Solo cobro cuando supero ese mínimo · Escala con el rendimiento logrado</p>
+  </div>
+
+  <div class="tier-grid">
+
+    <!-- Tier 0: below hurdle -->
+    <div class="tier-card tier-zero">
+      <div class="tier-range-label">Rendimiento</div>
+      <div class="tier-range">0% – 8.8%</div>
+      <div class="tier-badge-wrap"><span class="tier-badge zero">Sin Comisión</span></div>
+      <div class="tier-rate">0%</div>
+      <div class="tier-desc">Por debajo del hurdle rate.<br>El cliente se queda con todo.</div>
+      <div class="tier-example">
+        <span class="ex-label">Mi ganancia ($1M)</span>
+        <span class="ex-val zero-val">$0</span>
+      </div>
+    </div>
+
+    <!-- Tier 1 -->
+    <div class="tier-card tier-1">
+      <div class="tier-range-label">Rendimiento</div>
+      <div class="tier-range">8.8% – 20%</div>
+      <div class="tier-badge-wrap"><span class="tier-badge t1">Tier 1</span></div>
+      <div class="tier-rate">25%</div>
+      <div class="tier-desc">del excedente sobre 8.8%<br><em>Exceso máx.: 11.2 pp</em></div>
+      <div class="tier-example">
+        <span class="ex-label">Mi ganancia ($1M a 20%)</span>
+        <span class="ex-val">$28,000</span>
+      </div>
+    </div>
+
+    <!-- Tier 2 -->
+    <div class="tier-card tier-2">
+      <div class="tier-range-label">Rendimiento</div>
+      <div class="tier-range">20% – 30%</div>
+      <div class="tier-badge-wrap"><span class="tier-badge t2">Tier 2</span></div>
+      <div class="tier-rate">33%</div>
+      <div class="tier-desc">del excedente sobre 8.8%<br><em>Exceso máx.: 21.2 pp</em></div>
+      <div class="tier-example">
+        <span class="ex-label">Mi ganancia ($1M a 30%)</span>
+        <span class="ex-val">$69,960</span>
+      </div>
+    </div>
+
+    <!-- Tier 3 -->
+    <div class="tier-card tier-3">
+      <div class="tier-range-label">Rendimiento</div>
+      <div class="tier-range">30% – 40%</div>
+      <div class="tier-badge-wrap"><span class="tier-badge t3">Tier 3</span></div>
+      <div class="tier-rate">42%</div>
+      <div class="tier-desc">del excedente sobre 8.8%<br><em>Exceso máx.: 31.2 pp</em></div>
+      <div class="tier-example">
+        <span class="ex-label">Mi ganancia ($1M a 40%)</span>
+        <span class="ex-val">$131,040</span>
+      </div>
+    </div>
+
+    <!-- Tier 4 -->
+    <div class="tier-card tier-4">
+      <div class="tier-range-label">Rendimiento</div>
+      <div class="tier-range">40% – 50%</div>
+      <div class="tier-badge-wrap"><span class="tier-badge t4">Tier 4</span></div>
+      <div class="tier-rate">50%</div>
+      <div class="tier-desc">del excedente sobre 8.8%<br><em>Exceso máx.: 41.2 pp</em></div>
+      <div class="tier-example">
+        <span class="ex-label">Mi ganancia ($1M a 50%)</span>
+        <span class="ex-val">$206,000</span>
+      </div>
+    </div>
+
+    <!-- Tier 5 -->
+    <div class="tier-card tier-5">
+      <div class="tier-range-label">Rendimiento</div>
+      <div class="tier-range">50% – 60%</div>
+      <div class="tier-badge-wrap"><span class="tier-badge t5">Tier 5 ★</span></div>
+      <div class="tier-rate">58%</div>
+      <div class="tier-desc">del excedente sobre 8.8%<br><em>Exceso máx.: 51.2 pp</em></div>
+      <div class="tier-example">
+        <span class="ex-label">Mi ganancia ($1M a 60%)</span>
+        <span class="ex-val gold-val">$296,960</span>
+      </div>
+    </div>
+
+  </div><!-- /tier-grid -->
+
+  <!-- Summary table -->
+  <div class="tier-table-wrap">
+    <div class="tier-table-title">📋 Tabla resumen · Ejemplo con $1,000,000 MXN bajo gestión</div>
+    <div class="tier-table-scroll">
+      <table class="tier-table">
+        <thead>
+          <tr>
+            <th>Rendimiento</th>
+            <th>Exceso sobre 8.8%</th>
+            <th>Mi tasa</th>
+            <th>Exceso en $</th>
+            <th>Mi comisión</th>
+            <th>Neto cliente</th>
+            <th>Capital final cliente</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-zero">
+            <td>8.8%</td><td>0 pp</td><td class="rate-cell">0%</td>
+            <td>$0</td><td class="comm-cell">$0</td>
+            <td>$88,000</td><td>$1,088,000</td>
+          </tr>
+          <tr>
+            <td>15%</td><td>6.2 pp</td><td class="rate-cell t1c">25%</td>
+            <td>$62,000</td><td class="comm-cell">$15,500</td>
+            <td>$134,500</td><td>$1,134,500</td>
+          </tr>
+          <tr>
+            <td>20%</td><td>11.2 pp</td><td class="rate-cell t1c">25%</td>
+            <td>$112,000</td><td class="comm-cell">$28,000</td>
+            <td>$172,000</td><td>$1,172,000</td>
+          </tr>
+          <tr>
+            <td>25%</td><td>16.2 pp</td><td class="rate-cell t2c">33%</td>
+            <td>$162,000</td><td class="comm-cell">$53,460</td>
+            <td>$196,540</td><td>$1,196,540</td>
+          </tr>
+          <tr>
+            <td>30%</td><td>21.2 pp</td><td class="rate-cell t2c">33%</td>
+            <td>$212,000</td><td class="comm-cell">$69,960</td>
+            <td>$230,040</td><td>$1,230,040</td>
+          </tr>
+          <tr>
+            <td>35%</td><td>26.2 pp</td><td class="rate-cell t3c">42%</td>
+            <td>$262,000</td><td class="comm-cell">$110,040</td>
+            <td>$239,960</td><td>$1,239,960</td>
+          </tr>
+          <tr>
+            <td>40%</td><td>31.2 pp</td><td class="rate-cell t3c">42%</td>
+            <td>$312,000</td><td class="comm-cell">$131,040</td>
+            <td>$268,960</td><td>$1,268,960</td>
+          </tr>
+          <tr>
+            <td>45%</td><td>36.2 pp</td><td class="rate-cell t4c">50%</td>
+            <td>$362,000</td><td class="comm-cell">$181,000</td>
+            <td>$269,000</td><td>$1,269,000</td>
+          </tr>
+          <tr>
+            <td>50%</td><td>41.2 pp</td><td class="rate-cell t4c">50%</td>
+            <td>$412,000</td><td class="comm-cell">$206,000</td>
+            <td>$294,000</td><td>$1,294,000</td>
+          </tr>
+          <tr>
+            <td>55%</td><td>46.2 pp</td><td class="rate-cell t5c">58%</td>
+            <td>$462,000</td><td class="comm-cell">$267,960</td>
+            <td>$282,040</td><td>$1,282,040</td>
+          </tr>
+          <tr class="row-gold">
+            <td>60%</td><td>51.2 pp</td><td class="rate-cell t5c">58%</td>
+            <td>$512,000</td><td class="comm-cell gold-comm">$296,960</td>
+            <td>$303,040</td><td>$1,303,040</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tier-note">* La tasa aplica sobre el <strong>excedente en pesos</strong> = Capital × (Rendimiento% − 8.8%) / 100 &nbsp;·&nbsp; Hurdle rate fijo 8.8%</p>
+  </div>
+
+</section>
+
+<!-- TIER CSS -->
+<style>
+  .tier-section {
+    max-width: 1100px;
+    margin: 48px auto 0;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+  .tier-header { text-align: center; margin-bottom: 32px; }
+  .tier-title {
+    font-size: clamp(20px, 5vw, 32px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #e6edf3 20%, var(--gold) 80%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .tier-sub { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+  /* cards grid */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  @media (min-width: 600px)  { .tier-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 900px)  { .tier-grid { grid-template-columns: repeat(6, 1fr); } }
+
+  .tier-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, border-color .2s;
+  }
+  .tier-card:hover { transform: translateY(-3px); border-color: var(--border-h); }
+
+  .tier-range-label { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .tier-range  { font-size: 13px; font-weight: 800; color: var(--text); line-height: 1.2; }
+  .tier-badge-wrap { margin: 4px 0; }
+  .tier-badge {
+    display: inline-block;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 100px;
+  }
+  .tier-badge.zero   { background: rgba(139,148,158,.15); color: var(--muted); }
+  .tier-badge.t1     { background: rgba(79,140,255,.18);  color: #4f8cff; }
+  .tier-badge.t2     { background: rgba(34,211,238,.18);  color: #22d3ee; }
+  .tier-badge.t3     { background: rgba(0,229,160,.18);   color: var(--accent); }
+  .tier-badge.t4     { background: rgba(192,132,252,.18); color: #c084fc; }
+  .tier-badge.t5     { background: rgba(251,191,36,.18);  color: var(--gold); }
+
+  .tier-rate {
+    font-size: clamp(26px, 6vw, 36px);
+    font-weight: 900;
+    line-height: 1;
+  }
+  .tier-zero .tier-rate   { color: var(--muted); }
+  .tier-1    .tier-rate   { color: #4f8cff; }
+  .tier-2    .tier-rate   { color: #22d3ee; }
+  .tier-3    .tier-rate   { color: var(--accent); }
+  .tier-4    .tier-rate   { color: #c084fc; }
+  .tier-5    .tier-rate   { color: var(--gold); }
+
+  .tier-desc { font-size: 10px; color: var(--muted); line-height: 1.5; }
+  .tier-desc em { color: rgba(139,148,158,.7); font-style: normal; }
+
+  .tier-example {
+    display: flex; flex-direction: column; gap: 2px;
+    margin-top: 6px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .ex-label { font-size: 9px; color: var(--muted); font-weight: 600; letter-spacing: .5px; }
+  .ex-val   { font-size: 13px; font-weight: 800; color: var(--accent); }
+  .zero-val { color: var(--muted); }
+  .gold-val { color: var(--gold); }
+
+  /* summary table */
+  .tier-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .tier-table-title {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px;
+  }
+  .tier-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 580px;
+  }
+  .tier-table th {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .tier-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .tier-table tbody tr:hover td { background: rgba(255,255,255,.03); }
+  .tier-table tbody tr:last-child td { border-bottom: none; }
+
+  .rate-cell { font-weight: 800; font-size: 13px; }
+  .comm-cell { font-weight: 700; color: var(--accent); }
+  .t1c { color: #4f8cff; }
+  .t2c { color: #22d3ee; }
+  .t3c { color: var(--accent); }
+  .t4c { color: #c084fc; }
+  .t5c { color: var(--gold); }
+
+  .row-zero td { color: var(--muted); }
+  .row-zero .comm-cell { color: var(--muted); }
+  .row-gold td { background: rgba(251,191,36,.05); }
+  .gold-comm { color: var(--gold) !important; }
+
+  .tier-note {
+    font-size: 11px; color: var(--muted);
+    margin-top: 14px; line-height: 1.6;
+  }
+</style>
 
 <footer>
   Mike Garnica · Dashboard Personal de Comisiones · Portfolio Management MXN
